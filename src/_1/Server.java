@@ -2,6 +2,7 @@ package _1;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
@@ -9,32 +10,33 @@ public class Server {
 
 	static final int PORT = 5000;
 	protected ServerSocket serverSocket;
-	protected DataOutputStream dataOutputStream;
-	protected DataInputStream dataInputStream;
 
 	public Server() {
 		try {
-			// Server socket
-			ServerSocket serverSocket = new ServerSocket(PORT);
-			System.out.println("Listening port = " + PORT);
+			// Establish server socket
+			establishServer();
 
 			// Client socket
 			Socket clientSocket = serverSocket.accept();
 			System.out.println("Client connected");
 
-			// Data input and output streams
+			// Data input and output streams for this client
 			DataOutputStream dataOutputStream = new DataOutputStream(clientSocket.getOutputStream());
 			DataInputStream dataInputStream = new DataInputStream(clientSocket.getInputStream());
 
 			// Send response to client when its connected
 			dataOutputStream.writeUTF("Hello, client");
 
-			// Receive request from client with data = 2
-			// 2 + 2 = 4
-			System.out.println(dataInputStream.read() + 2);
+			double a = dataInputStream.readDouble();
+			double b = dataInputStream.readDouble();
+
+			double sum = a + b;
+			double rest = a - b;
+
+			dataOutputStream.writeDouble(sum);
+			dataOutputStream.writeDouble(rest);
 
 			clientSocket.close();
-
 			serverSocket.close();
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -45,7 +47,10 @@ public class Server {
 		new Server();
 	}
 
-	public void establishServer() {
+	public void establishServer() throws IOException {
+		// Server socket
+		serverSocket = new ServerSocket(PORT);
+		System.out.println("Listening port = " + PORT);
 
 	}
 }
